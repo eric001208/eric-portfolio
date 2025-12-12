@@ -26,6 +26,7 @@ body{
   font-size: 1.2rem;
   margin: 0 0 8px;
   color: var(--text);
+  text-transform: uppercase;
 }
 
 .project-location {
@@ -139,8 +140,8 @@ main {
   gap: 10px;
   padding: 0 48px 10px;   /* smaller bottom padding so stacked hero sections sit closer */
   grid-template-areas:
-    "wide wide tall "
-    "small-left small-right tall";
+    "tall wide wide"
+    "tall small-left small-right";
 }
 
 .hero--reverse {
@@ -358,6 +359,7 @@ main {
 .modal-title {
   margin: 0 0 12px;
   font-family: var(--font-heading);
+  text-transform: uppercase;
   font-size: 2rem;
 }
 
@@ -409,6 +411,99 @@ main {
   width: 100%;
   object-fit: cover;
   border-radius: 10px;                 /* each image gets rounded corners */
+}
+
+/* ==========================
+   Image lightbox (fullscreen viewer)
+   ========================== */
+
+.image-lightbox {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 220ms ease;
+  z-index: 3000;
+}
+
+.image-lightbox.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.image-lightbox-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.image-lightbox-inner {
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image-lightbox-inner img {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.image-lightbox-close {
+  position: absolute;
+  top: 24px;
+  right: 32px;
+  z-index: 2;
+  border: none;
+  background: none;
+  color: #525252a0;
+  font-size: 45px;
+  cursor: pointer;
+  transition: color 160ms ease, transform 160ms ease;
+}
+
+.image-lightbox-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  border: none;
+  background: none;
+  color: #525252a0;
+  font-size: 45px;
+  cursor: pointer;
+  padding: 8px 12px;
+  transition: color 160ms ease, transform 160ms ease;
+}
+
+.image-lightbox-prev {
+  left: 32px;
+}
+
+.image-lightbox-next {
+  right: 32px;
+}
+
+.image-lightbox-close:hover,
+.image-lightbox-close:focus-visible {
+  color: #ffffff;
+  transform: scale(1.05);
+}
+
+.image-lightbox-nav:hover,
+.image-lightbox-nav:focus-visible {
+  color: #ffffff;
+  transform: translateY(-50%) scale(1.05);
 }
 
 @media (max-width: 900px) {

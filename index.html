@@ -24,29 +24,29 @@
       <button class="category-tab is-active" type="button" data-category="all">All</button>
       <button class="category-tab" type="button" data-category="architecture">Architecture</button>
       <button class="category-tab" type="button" data-category="interior">Interior</button>
-      <button class="category-tab" type="button" data-category="concept">Concept Design</button>
-      <button class="category-tab" type="button" data-category="residential">Residential</button>
-      <button class="category-tab" type="button" data-category="office">Office</button>
+      <button class="category-tab" type="button" data-category="concept">Concept</button>
+      <button class="category-tab" type="button" data-category="Game">Game</button>
+      <button class="category-tab" type="button" data-category="Art">Art</button>
     </div>
 
     <!-- ALL: current layout with 8 projects -->
     <section class="category-view category-view--all" data-category-view="all">
       <section id="projects" class="hero">
         <!-- Tall left card -->
-        <article class="hero-card hero-card--wide" tabindex="0" data-title="Extend ICA" data-location="Philadelphia, USA" data-year="2023" data-type="architecture Infrastructure" data-description="An extension proposal that blends new public programs with the existing ICA context." data-images="image/project1/cover.jpg,image/project1/detail-1.png,image/project1/detail-2.png">
-          <img src="image/project1/cover.jpg" alt="Extend ICA">
+        <article class="hero-card hero-card--tall" tabindex="0" data-title="extend ica" data-location="Philadelphia, USA" data-year="2024" data-type="architecture Infrastructure" data-description="An extension of the ICA that explores exhibition architecture through layered circulation, controlled light, and sequential spatial experience." data-images="image/project1/cover.jpg,image/project1/detail-1.png,image/project1/detail-2.png">
+          <img src="image/project1/cover.jpg" alt="extend ica">
           <div class="hero-meta">
-            <p class="project-name">Extend ICA</p>
-            <span class="project-location">philadelphia, USA</span>
+            <p class="project-name">extend ica</p>
+            <span class="project-location">Philadelphia, USA</span>
           </div>
         </article>
 
         <!-- Top-right wide card -->
-        <article class="hero-card hero-card--tall" tabindex="0" data-title="Project Two" data-location="Beijing, China" data-year="2024" data-type="interior" data-description="Concept design focusing on light, landscape, and community gathering." data-images="image/project2/cover.jpg,image/project2/detail-1.png">
-          <img src="image/project2/cover.jpg" alt="Project Two">
+        <article class="hero-card hero-card--wide" tabindex="0" data-title="fantova nexus" data-location="Huesca, Spain" data-year="2023" data-type="architecture" data-description="A form-driven architectural proposal that translates Gaudí-inspired transformation techniques into a communal nexus connecting villagers, visitors, and artists." data-images="image/project2/cover.jpg,image/project2/detail-1.jpg,image/project2/detail-2.jpg,image/project2/detail-3.jpg,image/project2/detail-4.jpg,image/project2/detail-5.jpg,image/project2/detail-6.jpg,image/project2/detail-7.jpg,image/project2/detail-8.jpg,image/project2/detail-9.jpg">
+          <img src="image/project2/cover.jpg" alt="fantova nexus">
           <div class="hero-meta">
-            <p class="project-name">Project Two</p>
-            <span class="project-location">Beijing, China</span>
+            <p class="project-name">fantova nexus</p>
+            <span class="project-location">Huesca, Spain</span>
           </div>
         </article>
 
@@ -72,7 +72,7 @@
       <!-- Second block of 4 projects, mirrored layout -->
       <section class="hero hero--reverse">
         <!-- Top-left small card -->
-        <article class="hero-card hero-card--small-left" tabindex="0" data-title="Project Five" data-location="Tokyo, Japan" data-year="2026" data-type="Residential" data-description="Compact housing prototype with layered terraces." data-images="image/project1/cover.jpg">
+        <article class="hero-card hero-card--small-left" tabindex="0" data-title="Project Five" data-location="Tokyo, Japan" data-year="2026" data-type="Game" data-description="Compact housing prototype with layered terraces." data-images="image/project1/cover.jpg">
           <img src="image/project1/cover.jpg" alt="Project Five">
           <div class="hero-meta">
             <p class="project-name">Project Five</p>
@@ -81,7 +81,7 @@
         </article>
 
         <!-- Top-middle small card -->
-        <article class="hero-card hero-card--small-right" tabindex="0" data-title="Project Six" data-location="Seoul, Korea" data-year="2026" data-type="Office" data-description="Workplace concept emphasizing daylight and greenery." data-images="image/project2/cover.jpg">
+        <article class="hero-card hero-card--small-right" tabindex="0" data-title="Project Six" data-location="Seoul, Korea" data-year="2026" data-type="Art" data-description="Workplace concept emphasizing daylight and greenery." data-images="image/project2/cover.jpg">
           <img src="image/project2/cover.jpg" alt="Project Six">
           <div class="hero-meta">
             <p class="project-name">Project Six</p>
@@ -123,15 +123,6 @@
     </section>
 
     <!-- interior: different layout -->
-    <section class="category-view" data-category-view="interior" hidden>
-      <section class="hero hero--simple">
-        <article class="hero-card" tabindex="0" data-title="Project Two" data-location="Beijing, China" data-year="2024" data-type="interior" data-description="Concept design focusing on light, landscape, and community gathering." data-images="image/project2/cover.jpg,image/project2/detail-1.png">
-          <img src="image/project2/cover.jpg" alt="Project Two">
-          <div class="hero-meta">
-            <p class="project-name">Project Two</p>
-            <span class="project-location">Beijing, China</span>
-          </div>
-        </article>
 
         <article class="hero-card" tabindex="0" data-title="Project Four" data-location="Shenzhen, China" data-year="2025" data-type="interior" data-description="Another featured project with a compact composition." data-images="image/project2/cover.jpg">
           <img src="image/project2/cover.jpg" alt="Project Four">
@@ -172,10 +163,10 @@
       </section>
     </section>
 
-    <!-- RESIDENTIAL: different layout -->
-    <section class="category-view" data-category-view="residential" hidden>
+    <!-- Game: different layout -->
+    <section class="category-view" data-category-view="Game" hidden>
       <section class="hero hero--simple">
-        <article class="hero-card" tabindex="0" data-title="Project Five" data-location="Tokyo, Japan" data-year="2026" data-type="Residential" data-description="Compact housing prototype with layered terraces." data-images="image/project1/cover.jpg">
+        <article class="hero-card" tabindex="0" data-title="Project Five" data-location="Tokyo, Japan" data-year="2026" data-type="Game" data-description="Compact housing prototype with layered terraces." data-images="image/project1/cover.jpg">
           <img src="image/project1/cover.jpg" alt="Project Five">
           <div class="hero-meta">
             <p class="project-name">Project Five</p>
@@ -185,10 +176,10 @@
       </section>
     </section>
 
-    <!-- OFFICE: different layout -->
-    <section class="category-view" data-category-view="office" hidden>
+    <!-- Art: different layout -->
+    <section class="category-view" data-category-view="Art" hidden>
       <section class="hero hero--simple">
-        <article class="hero-card" tabindex="0" data-title="Project Six" data-location="Seoul, Korea" data-year="2026" data-type="Office" data-description="Workplace concept emphasizing daylight and greenery." data-images="image/project2/cover.jpg">
+        <article class="hero-card" tabindex="0" data-title="Project Six" data-location="Seoul, Korea" data-year="2026" data-type="Art" data-description="Workplace concept emphasizing daylight and greenery." data-images="image/project2/cover.jpg">
           <img src="image/project2/cover.jpg" alt="Project Six">
           <div class="hero-meta">
             <p class="project-name">Project Six</p>
@@ -218,6 +209,17 @@
         <div class="modal-image-wrap" id="modal-image-wrap">
         </div>
       </div>
+    </div>
+  </section>
+
+  <!-- Fullscreen image lightbox for modal images -->
+  <section class="image-lightbox" id="image-lightbox" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="image-lightbox-backdrop" data-lightbox-close></div>
+    <button class="image-lightbox-close" type="button" aria-label="Close image" data-lightbox-close>×</button>
+    <button class="image-lightbox-nav image-lightbox-prev" type="button" aria-label="Previous image" id="image-lightbox-prev">❮</button>
+    <button class="image-lightbox-nav image-lightbox-next" type="button" aria-label="Next image" id="image-lightbox-next">❯</button>
+    <div class="image-lightbox-inner">
+      <img id="image-lightbox-img" alt="Expanded project image">
     </div>
   </section>
 

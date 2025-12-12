@@ -16,7 +16,7 @@ const PROJECT_EXTRA_TEXT = {
     'The exhibition marks MAD\'s first solo show in the United States, exploring new relationships between institution, city, and public.',
     'Through architectural models, large-scale drawings, and immersive media, the project examines how an extension can act as both a frame and a stage for contemporary art.'
   ],
-  'Project Two': [
+  'fantova nexus': [
     'This interior concept is structured as a series of light wells that organize circulation and frame views to the surrounding landscape.',
     'Each chapter of the project tests different material atmospheres, from translucent partitions to mirrored ceilings.'
   ],
@@ -29,6 +29,8 @@ const PROJECT_EXTRA_TEXT = {
 
 let currentBaseDescription = '';
 let currentExtraParagraphs = [];
+let currentImageUrls = [];
+let currentImageIndex = 0;
 
 // Preload all project images once so the first modal open is smoother
 function preloadImages() {
@@ -104,10 +106,16 @@ function openModalFromCard(card) {
       if (coverImg && coverImg.src) urls.push(coverImg.src);
     }
 
+    currentImageUrls = urls;
+    currentImageIndex = 0;
+
     urls.forEach((url, i) => {
       const imgEl = document.createElement('img');
       imgEl.src = url;
       imgEl.alt = `${title || 'Project'} image ${i + 1}`;
+      imgEl.dataset.index = String(i);
+      imgEl.style.cursor = 'pointer';
+      imgEl.addEventListener('click', () => openImageLightbox(i));
       modalImageWrap.appendChild(imgEl);
     });
   }
@@ -165,6 +173,71 @@ if (modalReadMoreBtn) {
     modalReadMoreBtn.style.display = 'none';
   });
 }
+
+// ==========================
+// Image lightbox (fullscreen viewer)
+// ==========================
+
+const imageLightbox = document.getElementById('image-lightbox');
+const imageLightboxImg = document.getElementById('image-lightbox-img');
+const imageLightboxPrev = document.getElementById('image-lightbox-prev');
+const imageLightboxNext = document.getElementById('image-lightbox-next');
+const imageLightboxBackdrop = document.querySelector('.image-lightbox-backdrop');
+
+function showLightboxImage(index) {
+  if (!currentImageUrls.length || !imageLightboxImg) return;
+  const safeIndex = ((index % currentImageUrls.length) + currentImageUrls.length) % currentImageUrls.length;
+  currentImageIndex = safeIndex;
+  imageLightboxImg.src = currentImageUrls[safeIndex];
+}
+
+function openImageLightbox(startIndex) {
+  if (!imageLightbox) return;
+  if (!currentImageUrls.length) return;
+
+  showLightboxImage(startIndex || 0);
+  imageLightbox.classList.add('is-open');
+  imageLightbox.setAttribute('aria-hidden', 'false');
+}
+
+function closeImageLightbox() {
+  if (!imageLightbox) return;
+  imageLightbox.classList.remove('is-open');
+  imageLightbox.setAttribute('aria-hidden', 'true');
+}
+
+if (imageLightboxPrev) {
+  imageLightboxPrev.addEventListener('click', () => {
+    showLightboxImage(currentImageIndex - 1);
+  });
+}
+
+if (imageLightboxNext) {
+  imageLightboxNext.addEventListener('click', () => {
+    showLightboxImage(currentImageIndex + 1);
+  });
+}
+
+if (imageLightboxBackdrop) {
+  imageLightboxBackdrop.addEventListener('click', closeImageLightbox);
+}
+
+document.querySelectorAll('[data-lightbox-close]').forEach(btn => {
+  btn.addEventListener('click', closeImageLightbox);
+});
+
+// Close lightbox with Esc and navigate with arrow keys
+document.addEventListener('keydown', (e) => {
+  if (!imageLightbox || !imageLightbox.classList.contains('is-open')) return;
+
+  if (e.key === 'Escape') {
+    closeImageLightbox();
+  } else if (e.key === 'ArrowLeft') {
+    showLightboxImage(currentImageIndex - 1);
+  } else if (e.key === 'ArrowRight') {
+    showLightboxImage(currentImageIndex + 1);
+  }
+});
 
 // Start preloading after the page is loaded
 if (document.readyState === 'complete') {
