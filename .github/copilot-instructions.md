@@ -1,33 +1,33 @@
 # AI Coding Agent Instructions for Eric Portfolio
 
 ## Overview
-- Architecture portfolio site built with vanilla HTML, CSS, and JavaScript.
-- Primary projects view at [index.html](index.html); static bio page at [about.html](about.html).
-- Styling lives in [style.css](style.css); interaction logic for the projects page lives in [script.js](script.js) only.
-- No build tooling, package.json, or tests; serve the root folder with a simple static server (e.g., VS Code Live Server) and open [index.html](index.html) for the main experience.
-- Debug and iterate directly in the browser devtools; there is no separate dev/build pipeline, so HTML/CSS/JS edits take effect on reload.
+- Single-page architecture portfolio built with vanilla HTML, CSS, and JavaScript.
+- Primary projects grid at [index.html](index.html); minimal bio/footer page at [about.html](about.html).
+- Styles are centralized in [style.css](style.css); all interactive behavior for the projects page lives in [script.js](script.js).
+- No build tooling, bundler, or tests – run as a static site (e.g., VS Code Live Server) and reload the browser to see changes.
 
 ## Layout & Components
-- Global header `.site-header` is sticky with a glassmorphism nav `.site-nav`; both pages share this header and the "Projects/About" links.
-- The projects grid is organized into `.category-view` sections (values like `all`, `architecture`, `interior`, `concept`, `Game`, `Art`) containing one or more `.hero` blocks (`.hero`, `.hero--reverse`, `.hero--architecture`, `.hero--interior`).
-- Each `.hero` block is a CSS grid of `.hero-card` elements; card positioning is controlled entirely by CSS classes such as `hero-card--tall`, `hero-card--wide`, `hero-card--small-left`, `hero-card--small-right`, and `hero-card--interior-*` (tall-left/right, small-top/bottom).
-- Each `.hero-card` wraps a single `<img>` thumbnail plus `.hero-meta` overlay with `.project-name` and `.project-location`; overlays are revealed on hover/focus and should keep `tabindex="0"` for keyboard access.
+- Global header `.site-header` is sticky with glassmorphism nav `.site-nav`; both pages share this header and the "Projects/About" links (projects is an in-page `#projects` link on the index, a file link on the about page).
+- The projects grid is split into `.category-view` sections (currently `all`, `architecture`, `interior`, `concept`), each containing one or more `.hero` blocks (`.hero`, `.hero--reverse`, `.hero--architecture`, `.hero--interior`).
+- Each `.hero` is a CSS grid of `.hero-card` items; layout is controlled via classes such as `hero-card--tall`, `hero-card--wide`, `hero-card--small-left`, `hero-card--small-right`, `hero-card--small-top`, `hero-card--small-bottom`, and `hero-card--interior-*`.
+- Each `.hero-card` contains a single `<img>` thumbnail plus `.hero-meta` with `.project-name` and `.project-location`; `.hero-meta` appears on hover/focus, and cards must keep `tabindex="0"` so keyboard users can open the modal.
 
-## Modal & Lightbox Behavior
-- Clicking or keyboard-activating a `.hero-card` opens `#project-modal` via `openModalFromCard` in [script.js](script.js); do not bypass this helper when wiring new cards.
-- Modal content is driven by the card’s dataset: `data-title`, `data-location`, `data-year`, `data-type`, `data-description`, and `data-images` (comma-separated URLs).
-- `data-images` can mix still images and short videos (`.mp4`/`.webm`/`.ogg`); images render as `<img>` elements and videos as `<video>` elements that auto-play on hover/focus and can also open the fullscreen lightbox.
-- Longer copy is stored in `PROJECT_EXTRA_TEXT` in [script.js](script.js); keys must exactly match the `data-title` string (case-sensitive) to attach extra paragraphs to the modal "READ MORE" behavior.
-- The fullscreen `#image-lightbox` uses `currentImageUrls` and `currentImageIndex` to cycle through media, and supports navigation via the prev/next buttons, backdrop/cross buttons (`[data-lightbox-close]`), and keyboard (Esc, Arrow Left/Right).
+## Modal, Media & Lightbox
+- Clicking or keyboard-activating a `.hero-card` must go through `openModalFromCard(card)` in [script.js](script.js); do not manually populate the modal.
+- Modal content is read from the card dataset: `data-title`, `data-location`, `data-year`, `data-type`, `data-description`, and `data-images` (comma-separated URLs in display order).
+- `data-images` may mix images and short videos (`.mp4`/`.webm`/`.ogg`); images render as `<img>`, videos as `<video>` that auto-play on hover/focus and when scrolled into view (via an `IntersectionObserver` rooted on the modal image column).
+- Longer text lives in `PROJECT_EXTRA_TEXT` in [script.js](script.js); keys must exactly match the card’s `data-title` string (case-sensitive) to enable the modal "READ MORE" expansion.
+- The fullscreen `#image-lightbox` uses `currentImageUrls` and `currentImageIndex` to cycle media, with navigation via prev/next buttons, backdrop/cross (`[data-lightbox-close]`), and keyboard (Esc, Arrow Left/Right) only while the lightbox is open.
 
 ## JavaScript Patterns
-- Plain DOM API only; no external JS libraries. Elements are selected once at the top of [script.js](script.js) and reused; listeners are attached directly on those references.
-- `preloadImages()` walks all `.hero-card` elements and preloads image URLs from `data-images` (skipping video files) or the card `<img>` as a fallback, and is started on `window.load`; when adding projects, keep `data-images` in sync so preloading stays effective.
-- Category tabs `.category-tab` read `data-category` and toggle matching `[data-category-view]` sections by adding/removing `hidden` and `is-active`; the "Projects" nav link also forces the `all` category active and scrolls the page back to the top.
-- Keyboard support is important: `.hero-card` keydown handlers open the modal on Enter/Space, and the lightbox listens globally for Esc/Arrow keys only while it is open.
+- Plain DOM API only, no external JS libraries; elements are queried once at the top of [script.js](script.js) and reused.
+- `preloadImages()` walks all `.hero-card` elements on `window.load`, preloading URLs from `data-images` (skipping videos) or the cover `<img>` as fallback; keep `data-images` accurate so the first modal open stays smooth.
+- Category tabs `.category-tab` read `data-category` and toggle `[data-category-view]` sections by adding/removing `hidden` and the `is-active` class; when the "Projects" nav is clicked, it also scrolls to top and forces the `all` view active.
+- Keyboard support is first-class: `.hero-card` has keydown handlers for Enter/Space to open the modal, and the lightbox listens globally for Esc/Arrow keys only when it has the `is-open` class.
 
 ## Working in This Repo
-- To add a project, create a `.hero-card` in the appropriate `.category-view` in [index.html](index.html) with full `data-*` attributes, `tabindex="0"`, and a cover `<img>`; place assets under `image/<project-name>/` and list them in `data-images` in display order.
-- When changing layout, extend existing grid and card variants in [style.css](style.css) (`.hero*`, `.hero-card*`, `.hero-meta`) rather than introducing new layout systems, and reuse design tokens from `:root` (`--bg`, `--text`, `--font-*`, `--muted`, `--card-radius`).
-- The about page [about.html](about.html) shares the global styles and header; it uses only a tiny inline script to update the footer year—keep it simple and avoid moving shared logic out of [script.js](script.js) unless the pattern is clearly repeated across pages.
-- When adding richer long-form descriptions, edit `PROJECT_EXTRA_TEXT` near the top of [script.js](script.js), and ensure each key exactly matches the card’s `data-title` (including case and spacing) so the modal "READ MORE" feature picks it up.
+- To add a project, duplicate an existing `.hero-card` in the appropriate `.category-view` in [index.html](index.html), set full `data-*` attributes, keep `tabindex="0"`, and point the `<img>` and `data-images` to assets under `image/<project-name>/` (paths may include spaces, matching current folders).
+- When adding a new category, create a `.category-tab` button with `data-category="<name>"` and a matching `.category-view` section with `data-category-view="<name>"`; the JS relies on these attributes matching exactly.
+- For layout adjustments, extend existing grid and card variants in [style.css](style.css) (`.hero*`, `.hero-card*`, `.hero-meta`) and reuse tokens from `:root` (`--bg`, `--text`, `--font-*`, `--muted`, `--card-radius`) rather than introducing new layout systems.
+- The about page [about.html](about.html) shares global styles and uses a tiny inline script to update the footer year; keep it self-contained unless the same pattern starts repeating across multiple pages.
+- When enriching long-form descriptions, update `PROJECT_EXTRA_TEXT` in [script.js](script.js) and verify the keys align with `data-title` so the "READ MORE" button appears.

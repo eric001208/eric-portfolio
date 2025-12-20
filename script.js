@@ -9,6 +9,15 @@ const cards = document.querySelectorAll('.hero-card');
 const modalBackdrop = modal.querySelector('.modal-backdrop');
 const modalDialog = modal.querySelector('.modal-dialog');
 
+// Prevent background page from scrolling when overlays are open
+function lockBodyScroll() {
+  document.body.classList.add('body-lock-scroll');
+}
+
+function unlockBodyScroll() {
+  document.body.classList.remove('body-lock-scroll');
+}
+
 // Extra long-form descriptions per project (multi-paragraph)
 // Use the project title as the key; edit these strings to add more content.
 const PROJECT_EXTRA_TEXT = {
@@ -189,6 +198,9 @@ function openModalFromCard(card) {
   modal.classList.add('is-open');
   modal.setAttribute('aria-hidden', 'false');
 
+  // Lock background scroll while modal is open
+  lockBodyScroll();
+
   // Restart backdrop and dialog animations every time
   restartAnimation(modalBackdrop, 'is-animating');
   restartAnimation(modalDialog, 'is-animating');
@@ -210,6 +222,9 @@ function closeModal() {
   if (modalVideoObserver) {
     modalVideoObserver.disconnect();
   }
+
+  // Re-enable background scroll when modal closes
+  unlockBodyScroll();
 }
 
 cards.forEach(card => {

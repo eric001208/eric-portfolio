@@ -13,6 +13,11 @@ body{
     flex-direction: column;
 }
 
+/* When a modal/lightbox is open, prevent background page scrolling */
+body.body-lock-scroll {
+  overflow: hidden;
+}
+
 :root {
   --bg: #f7f7fb;
   --text: #222222;
@@ -583,13 +588,20 @@ main {
   }
 
   .modal-dialog {
-    width: calc(100% - 16px);       /* almost full-width on phones */
-    max-height: none;               /* let content define height on mobile */
-    margin: 16px auto;              /* small margin from top/bottom */
+    width: calc(100% - 32px);             /* keep margin from tablet edges */
+    max-height: calc(100vh - 32px);       /* always fit inside viewport height */
+    margin: 16px auto;                    /* small margin from top/bottom */
+    overflow-y: auto;                     /* scroll entire modal content */
   }
 
   .modal-text {
     margin-top: 32px;               /* reduce big top gap on mobile */
+  }
+
+  /* On small screens let the image column grow naturally;
+     the modal-dialog handles vertical scrolling instead. */
+  .modal-image-wrap {
+    max-height: none;
   }
 
   /* Stack all hero grids into a single column on small screens,
