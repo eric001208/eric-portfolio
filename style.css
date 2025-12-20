@@ -582,6 +582,12 @@ main {
     overflow-y: auto;
   }
 
+  /* On tablets/phones, align close button with text and edges */
+  .modal-close {
+    top: 16px;
+    left: 16px;
+  }
+
   .modal-layout {
     grid-template-columns: 1fr;
     padding: 32px 16px 24px 16px;   /* tighter padding on phones */

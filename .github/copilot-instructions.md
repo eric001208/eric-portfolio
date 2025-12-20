@@ -24,6 +24,7 @@
 - `preloadImages()` walks all `.hero-card` elements on `window.load`, preloading URLs from `data-images` (skipping videos) or the cover `<img>` as fallback; keep `data-images` accurate so the first modal open stays smooth.
 - Category tabs `.category-tab` read `data-category` and toggle `[data-category-view]` sections by adding/removing `hidden` and the `is-active` class; when the "Projects" nav is clicked, it also scrolls to top and forces the `all` view active.
 - Keyboard support is first-class: `.hero-card` has keydown handlers for Enter/Space to open the modal, and the lightbox listens globally for Esc/Arrow keys only when it has the `is-open` class.
+ - Full-screen overlays (like the project modal) lock background scroll via the `body-lock-scroll` class on `<body>` using `lockBodyScroll()` / `unlockBodyScroll()`; reuse this pattern for any new blocking overlays.
 
 ## Working in This Repo
 - To add a project, duplicate an existing `.hero-card` in the appropriate `.category-view` in [index.html](index.html), set full `data-*` attributes, keep `tabindex="0"`, and point the `<img>` and `data-images` to assets under `image/<project-name>/` (paths may include spaces, matching current folders).
