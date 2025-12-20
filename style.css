@@ -16,6 +16,8 @@ body{
 /* When a modal/lightbox is open, prevent background page scrolling */
 body.body-lock-scroll {
   overflow: hidden;
+  position: fixed;
+  width: 100%;
 }
 
 :root {

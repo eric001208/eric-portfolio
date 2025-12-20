@@ -10,12 +10,20 @@ const modalBackdrop = modal.querySelector('.modal-backdrop');
 const modalDialog = modal.querySelector('.modal-dialog');
 
 // Prevent background page from scrolling when overlays are open
+// Uses a fixed-position body pattern so it also works on iOS browsers.
+let scrollLockScrollTop = 0;
+
 function lockBodyScroll() {
+  scrollLockScrollTop = window.scrollY || document.documentElement.scrollTop || 0;
+  document.body.style.top = `-${scrollLockScrollTop}px`;
   document.body.classList.add('body-lock-scroll');
 }
 
 function unlockBodyScroll() {
   document.body.classList.remove('body-lock-scroll');
+  const restoreY = scrollLockScrollTop || 0;
+  document.body.style.top = '';
+  window.scrollTo(0, restoreY);
 }
 
 // Extra long-form descriptions per project (multi-paragraph)
