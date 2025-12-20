@@ -8,8 +8,12 @@ body{
     background-color: #ffffff;
     color:#111;
     line-height: 1.6;
+    min-height: 100vh;             /* make page at least full viewport height */
+    display: flex;                 /* flex column layout for sticky footer */
+    flex-direction: column;
+}
 
-}:root {
+:root {
   --bg: #f7f7fb;
   --text: #222222;
   --font-brand: "Rajdhani", sans-serif;
@@ -98,6 +102,7 @@ body{
 
 main {
   padding-top: 10px;
+  flex: 1 0 auto;   /* grow to fill space and push footer down */
 }
 
 .category-tabs {
@@ -147,8 +152,8 @@ main {
 .hero--reverse {
   /* mirrored layout for the next 4 projects */
   grid-template-areas:
-    "small-left small-right tall"
-    "wide wide tall";
+    "wide wide small-top"
+    "small-left small-right small-bottom";
 }
 
 .hero--architecture{
@@ -170,8 +175,8 @@ main {
   padding: 0 48px 10px;   /* smaller bottom padding so stacked hero sections sit closer */
   /* two tall columns (left, middle) and two stacked small cards (right) */
   grid-template-areas:
-    "tall-left tall-right small-top"
-    "tall-left tall-right small-bottom";
+    "wide wide small-top"
+    "small-left small-right small-bottom";
 }
 
 .hero-card {
@@ -440,6 +445,13 @@ main {
   border-radius: 10px;                 /* each image gets rounded corners */
 }
 
+.modal-image-wrap video {
+  display: block;
+  width: 100%;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
 /* ==========================
    Image lightbox (fullscreen viewer)
    ========================== */
@@ -481,6 +493,13 @@ main {
 
 .image-lightbox-inner img {
   display: block;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.image-lightbox-inner video {
+  display: none;          /* hidden by default; shown when active */
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
@@ -534,26 +553,98 @@ main {
 }
 
 @media (max-width: 900px) {
+  /* Soften header effects and spacing for mobile/tablet */
+  .site-header {
+    padding: 8px 20px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.04);
+  }
+
+  .brand {
+    font-size: 1.6rem;
+  }
+
+  .site-nav {
+    gap: 16px;
+    font-size: 0.75rem;
+  }
+
+  /* Make the modal behave like a full-height scrolling panel on phones */
+  .modal {
+    align-items: flex-start;
+    overflow-y: auto;
+  }
+
   .modal-layout {
     grid-template-columns: 1fr;
-    padding: 64px 24px 32px 24px;
+    padding: 32px 16px 24px 16px;   /* tighter padding on phones */
   }
 
   .modal-dialog {
-    width: calc(100% - 32px);
+    width: calc(100% - 16px);       /* almost full-width on phones */
+    max-height: none;               /* let content define height on mobile */
+    margin: 16px auto;              /* small margin from top/bottom */
   }
 
-  .hero {
-    grid-template-columns: 1fr;   /* stack hero cards on small screens */
-    grid-auto-rows: auto;
+  .modal-text {
+    margin-top: 32px;               /* reduce big top gap on mobile */
+  }
+
+  /* Stack all hero grids into a single column on small screens,
+     and give each card the same height so the panels match. */
+  .hero,
+  .hero--architecture,
+  .hero--interior {
+    grid-template-columns: 1fr;
+    grid-auto-rows: 320px;  /* equal height panels on mobile */
     grid-template-areas: none;
+    padding: 0 20px 10px;   /* softer side padding on phones */
+  }
+
+  /* On touch devices, keep images static and in color
+     to avoid janky hover animations while tapping/scrolling. */
+  .hero-card img {
+    filter: grayscale(0%);
+    transform: none;
+  }
+
+  .hero-card:hover img,
+  .hero-card:focus-within img {
+    transform: none;
+    filter: grayscale(0%);
   }
 
   .hero-card--tall,
   .hero-card--wide,
   .hero-card--small-left,
-  .hero-card--small-right {
+  .hero-card--small-right,
+  .hero-card--interior-tall-left,
+  .hero-card--interior-tall-right,
+  .hero-card--interior-small-top,
+  .hero-card--interior-small-bottom {
     grid-area: auto;
+  }
+
+  /* On touch devices, always show the hero-meta overlay
+     since there is no hover state. */
+  .hero-meta {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .category-tabs {
+    padding: 16px 20px 32px;        /* align tabs with hero padding */
+    gap: 20px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;          /* Firefox hide scrollbar */
+  }
+
+  .category-tabs::-webkit-scrollbar {
+    display: none;                  /* WebKit hide scrollbar */
   }
 }
 

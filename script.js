@@ -12,7 +12,7 @@ const modalDialog = modal.querySelector('.modal-dialog');
 // Extra long-form descriptions per project (multi-paragraph)
 // Use the project title as the key; edit these strings to add more content.
 const PROJECT_EXTRA_TEXT = {
-  'Extend ICA': [
+  'extend ica': [
     'The exhibition marks MAD\'s first solo show in the United States, exploring new relationships between institution, city, and public.',
     'Through architectural models, large-scale drawings, and immersive media, the project examines how an extension can act as both a frame and a stage for contemporary art.'
   ],
@@ -31,6 +31,28 @@ let currentBaseDescription = '';
 let currentExtraParagraphs = [];
 let currentImageUrls = [];
 let currentImageIndex = 0;
+
+// Observer to auto-play/pause modal videos when they enter/leave view
+let modalVideoObserver = null;
+
+if ('IntersectionObserver' in window && modalImageWrap) {
+  modalVideoObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      const videoEl = entry.target;
+      if (!(videoEl instanceof HTMLVideoElement)) return;
+
+      if (entry.isIntersecting) {
+        videoEl.play().catch(() => {});
+      } else {
+        videoEl.pause();
+        videoEl.currentTime = 0;
+      }
+    });
+  }, {
+    root: modalImageWrap,
+    threshold: 0.6
+  });
+}
 
 // Preload all project images once so the first modal open is smoother
 function preloadImages() {
@@ -51,6 +73,8 @@ function preloadImages() {
 
     urls.forEach(url => {
       if (!url || seen.has(url)) return;
+      // Skip video files here; they are handled separately in the modal
+      if (/\.(mp4|webm|ogg)([?#].*)?$/i.test(url)) return;
       seen.add(url);
       const img = new Image();
       img.src = url;
@@ -96,6 +120,11 @@ function openModalFromCard(card) {
   if (modalImageWrap) {
     modalImageWrap.innerHTML = '';
 
+    // Stop observing any previous videos; new ones will be re-registered
+    if (modalVideoObserver) {
+      modalVideoObserver.disconnect();
+    }
+
     let urls = [];
     if (images) {
       urls = images.split(',').map(s => s.trim()).filter(Boolean);
@@ -110,13 +139,50 @@ function openModalFromCard(card) {
     currentImageIndex = 0;
 
     urls.forEach((url, i) => {
-      const imgEl = document.createElement('img');
-      imgEl.src = url;
-      imgEl.alt = `${title || 'Project'} image ${i + 1}`;
-      imgEl.dataset.index = String(i);
-      imgEl.style.cursor = 'pointer';
-      imgEl.addEventListener('click', () => openImageLightbox(i));
-      modalImageWrap.appendChild(imgEl);
+      const isVideo = /\.(mp4|webm|ogg)([?#].*)?$/i.test(url);
+
+      if (isVideo) {
+        const videoEl = document.createElement('video');
+        videoEl.src = url;
+        videoEl.playsInline = true;
+        videoEl.loop = true;              // repeat like a GIF
+        videoEl.muted = true;             // allow autoplay on hover
+        videoEl.preload = 'metadata';
+        videoEl.tabIndex = 0;             // keyboard focusable
+
+        // Play when hovered or focused; pause + reset when leaving
+        const startVideo = () => {
+          videoEl.play().catch(() => {});
+        };
+        const stopVideo = () => {
+          videoEl.pause();
+          videoEl.currentTime = 0;
+        };
+
+        videoEl.addEventListener('mouseenter', startVideo);
+        videoEl.addEventListener('focus', startVideo);
+        videoEl.addEventListener('mouseleave', stopVideo);
+        videoEl.addEventListener('blur', stopVideo);
+
+        // Allow fullscreen lightbox open from the video as well
+        videoEl.style.cursor = 'pointer';
+        videoEl.addEventListener('click', () => openImageLightbox(i));
+
+        // Also auto-play when scrolled into view and reset when leaving
+        if (modalVideoObserver) {
+          modalVideoObserver.observe(videoEl);
+        }
+
+        modalImageWrap.appendChild(videoEl);
+      } else {
+        const imgEl = document.createElement('img');
+        imgEl.src = url;
+        imgEl.alt = `${title || 'Project'} image ${i + 1}`;
+        imgEl.dataset.index = String(i);
+        imgEl.style.cursor = 'pointer';
+        imgEl.addEventListener('click', () => openImageLightbox(i));
+        modalImageWrap.appendChild(imgEl);
+      }
     });
   }
 
@@ -131,6 +197,19 @@ function openModalFromCard(card) {
 function closeModal() {
   modal.classList.remove('is-open');
   modal.setAttribute('aria-hidden', 'true');
+
+  // Ensure any modal videos are stopped and reset when closing
+  if (modalImageWrap) {
+    const videos = modalImageWrap.querySelectorAll('video');
+    videos.forEach(videoEl => {
+      videoEl.pause();
+      videoEl.currentTime = 0;
+    });
+  }
+
+  if (modalVideoObserver) {
+    modalVideoObserver.disconnect();
+  }
 }
 
 cards.forEach(card => {
@@ -180,22 +259,50 @@ if (modalReadMoreBtn) {
 
 const imageLightbox = document.getElementById('image-lightbox');
 const imageLightboxImg = document.getElementById('image-lightbox-img');
+const imageLightboxVideo = document.getElementById('image-lightbox-video');
 const imageLightboxPrev = document.getElementById('image-lightbox-prev');
 const imageLightboxNext = document.getElementById('image-lightbox-next');
 const imageLightboxBackdrop = document.querySelector('.image-lightbox-backdrop');
 
-function showLightboxImage(index) {
-  if (!currentImageUrls.length || !imageLightboxImg) return;
+function showLightboxMedia(index) {
+  if (!currentImageUrls.length || (!imageLightboxImg && !imageLightboxVideo)) return;
+
   const safeIndex = ((index % currentImageUrls.length) + currentImageUrls.length) % currentImageUrls.length;
   currentImageIndex = safeIndex;
-  imageLightboxImg.src = currentImageUrls[safeIndex];
+
+  const url = currentImageUrls[safeIndex];
+  const isVideo = /\.(mp4|webm|ogg)([?#].*)?$/i.test(url);
+
+  if (isVideo) {
+    // Hide image, show video
+    if (imageLightboxImg) {
+      imageLightboxImg.style.display = 'none';
+      imageLightboxImg.src = '';
+    }
+    if (imageLightboxVideo) {
+      imageLightboxVideo.style.display = 'block';
+      imageLightboxVideo.src = url;
+      imageLightboxVideo.play().catch(() => {});
+    }
+  } else {
+    // Hide video, show image
+    if (imageLightboxVideo) {
+      imageLightboxVideo.pause();
+      imageLightboxVideo.src = '';
+      imageLightboxVideo.style.display = 'none';
+    }
+    if (imageLightboxImg) {
+      imageLightboxImg.style.display = 'block';
+      imageLightboxImg.src = url;
+    }
+  }
 }
 
 function openImageLightbox(startIndex) {
   if (!imageLightbox) return;
   if (!currentImageUrls.length) return;
 
-  showLightboxImage(startIndex || 0);
+  showLightboxMedia(startIndex || 0);
   imageLightbox.classList.add('is-open');
   imageLightbox.setAttribute('aria-hidden', 'false');
 }
@@ -208,13 +315,13 @@ function closeImageLightbox() {
 
 if (imageLightboxPrev) {
   imageLightboxPrev.addEventListener('click', () => {
-    showLightboxImage(currentImageIndex - 1);
+    showLightboxMedia(currentImageIndex - 1);
   });
 }
 
 if (imageLightboxNext) {
   imageLightboxNext.addEventListener('click', () => {
-    showLightboxImage(currentImageIndex + 1);
+    showLightboxMedia(currentImageIndex + 1);
   });
 }
 
@@ -233,9 +340,9 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
     closeImageLightbox();
   } else if (e.key === 'ArrowLeft') {
-    showLightboxImage(currentImageIndex - 1);
+    showLightboxMedia(currentImageIndex - 1);
   } else if (e.key === 'ArrowRight') {
-    showLightboxImage(currentImageIndex + 1);
+    showLightboxMedia(currentImageIndex + 1);
   }
 });
 
