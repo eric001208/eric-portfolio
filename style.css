@@ -582,6 +582,9 @@ main {
   .modal {
     align-items: flex-start;
     overflow-y: auto;
+    /* Respect safe areas (notch / browser bars) on mobile browsers */
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 
   /* On tablets/phones, align close button with text and edges */
@@ -596,8 +599,8 @@ main {
   }
 
   .modal-dialog {
-    width: calc(100% - 32px);             /* keep margin from tablet edges */
-    max-height: calc(100vh - 32px);       /* always fit inside viewport height */
+    width: calc(100% - 32px);                 /* keep margin from tablet edges */
+    max-height: calc(100dvh - 32px);          /* use dynamic viewport to avoid going under browser bars */
     margin: 16px auto;                    /* small margin from top/bottom */
     overflow-y: auto;                     /* scroll entire modal content */
   }
