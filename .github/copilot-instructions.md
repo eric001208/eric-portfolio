@@ -1,10 +1,10 @@
 # AI Coding Agent Instructions for Eric Portfolio
 
 ## Overview
-- Single-page architecture portfolio built with vanilla HTML, CSS, and JavaScript.
-- Primary projects grid at [index.html](index.html); minimal bio/footer page at [about.html](about.html).
+- Static architecture portfolio site with a main projects page and a minimal about page, built with vanilla HTML, CSS, and JavaScript.
+- Primary projects grid at [index.html](index.html); bio/footer at [about.html](about.html).
 - Styles are centralized in [style.css](style.css); all interactive behavior for the projects page lives in [script.js](script.js).
-- No build tooling, bundler, or tests – run as a static site (e.g., VS Code Live Server) and reload the browser to see changes.
+- No build tooling, bundler, or tests – open as a static site (e.g., VS Code Live Server) and reload the browser to see changes.
 
 ## Layout & Components
 - Global header `.site-header` is sticky with glassmorphism nav `.site-nav`; both pages share this header and the "Projects/About" links (projects is an in-page `#projects` link on the index, a file link on the about page).
@@ -22,9 +22,9 @@
 ## JavaScript Patterns
 - Plain DOM API only, no external JS libraries; elements are queried once at the top of [script.js](script.js) and reused.
 - `preloadImages()` walks all `.hero-card` elements on `window.load`, preloading URLs from `data-images` (skipping videos) or the cover `<img>` as fallback; keep `data-images` accurate so the first modal open stays smooth.
-- Category tabs `.category-tab` read `data-category` and toggle `[data-category-view]` sections by adding/removing `hidden` and the `is-active` class; when the "Projects" nav is clicked, it also scrolls to top and forces the `all` view active.
+- Category tabs `.category-tab` read `data-category` and toggle `[data-category-view]` sections by adding/removing `hidden` and the `is-active` class; when the "Projects" nav is clicked, it scrolls to the top and forces the `all` view active.
 - Keyboard support is first-class: `.hero-card` has keydown handlers for Enter/Space to open the modal, and the lightbox listens globally for Esc/Arrow keys only when it has the `is-open` class.
- - Full-screen overlays (like the project modal) lock background scroll via the `body-lock-scroll` class on `<body>` using `lockBodyScroll()` / `unlockBodyScroll()`; reuse this pattern for any new blocking overlays.
+- Full-screen overlays (like the project modal and image lightbox) lock background scroll via the `body-lock-scroll` class on `<body>` using `lockBodyScroll()` / `unlockBodyScroll()`; reuse this pattern for any new blocking overlays.
 
 ## Working in This Repo
 - To add a project, duplicate an existing `.hero-card` in the appropriate `.category-view` in [index.html](index.html), set full `data-*` attributes, keep `tabindex="0"`, and point the `<img>` and `data-images` to assets under `image/<project-name>/` (paths may include spaces, matching current folders).
@@ -32,3 +32,10 @@
 - For layout adjustments, extend existing grid and card variants in [style.css](style.css) (`.hero*`, `.hero-card*`, `.hero-meta`) and reuse tokens from `:root` (`--bg`, `--text`, `--font-*`, `--muted`, `--card-radius`) rather than introducing new layout systems.
 - The about page [about.html](about.html) shares global styles and uses a tiny inline script to update the footer year; keep it self-contained unless the same pattern starts repeating across multiple pages.
 - When enriching long-form descriptions, update `PROJECT_EXTRA_TEXT` in [script.js](script.js) and verify the keys align with `data-title` so the "READ MORE" button appears.
+ 
+## DOM & Data Contracts
+- IDs and class hooks like `#project-modal`, `#image-lightbox`, `.hero-card`, `.category-tab`, and `[data-category-view]` are hard-wired in [script.js](script.js); if you rename them in HTML, update the corresponding selectors instead of adding duplicate logic.
+- Each `.hero-card` is expected to carry `data-title`, `data-location`, `data-year`, `data-type`, `data-description`, and `data-images`; missing attributes won’t crash but will produce incomplete modal/meta content.
+- `data-images` defines both modal gallery order and full-screen lightbox order; keep the first image matching the card thumbnail where possible so preloading and visual continuity stay smooth.
+- Video URLs in `data-images` should remain short, looping clips; they are muted, looped, and controlled via hover, focus, and scroll visibility inside the modal, and they also participate in the lightbox carousel.
+- Global state like `PROJECT_EXTRA_TEXT`, `currentImageUrls`, `currentImageIndex`, `scrollLockScrollTop`, and the `IntersectionObserver` are shared across interactions; prefer extending their behavior rather than replacing them with new globals.

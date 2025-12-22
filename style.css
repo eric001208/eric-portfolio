@@ -186,6 +186,18 @@ main {
     "small-left small-right small-bottom";
 }
 
+.hero--concept{
+  display: grid;
+  grid-template-columns: 1.3fr 1.35fr 1.35fr;
+  grid-auto-rows: 400px;
+  gap: 10px;
+  padding: 0 48px 10px;   /* smaller bottom padding so stacked hero sections sit closer */
+  /* two tall columns (left, middle) and two stacked small cards (right) */
+  grid-template-areas:
+    "tall small-left small-right"
+    "tall small-left small-right";
+}
+
 .hero-card {
   position: relative;
   border-radius: var(--card-radius);
@@ -392,7 +404,11 @@ main {
   font-family: var(--font-body);
   color: var(--text);
   font-size: 0.9rem;
-  margin-top: 88px;
+  margin-top: 40px;
+  /* Let the text column scroll independently while staying fully inside the dialog */
+  max-height: calc(100vh - 260px);
+  overflow-y: auto;
+  padding-right: 10px; /* breathing room next to scrollbar */
 }
 
 .modal-title {
@@ -417,6 +433,7 @@ main {
 
 .modal-description p {
   margin: 0 0 8px;
+  white-space: pre-line;   /* respect line breaks in description text */
 }
 
 .modal-read-more {
@@ -607,6 +624,8 @@ main {
 
   .modal-text {
     margin-top: 32px;               /* reduce big top gap on mobile */
+    max-height: none;               /* use full height; dialog scrolls instead */
+    overflow: visible;
   }
 
   /* On small screens let the image column grow naturally;

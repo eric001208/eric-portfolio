@@ -4,6 +4,7 @@ const modalTitle = document.getElementById('modal-title');
 const modalMeta = document.getElementById('modal-meta-line');
 const modalDesc = document.getElementById('modal-description');
 const modalReadMoreBtn = document.getElementById('modal-read-more');
+const modalTextCol = document.querySelector('.modal-text');
 const modalImageWrap = document.getElementById('modal-image-wrap');
 const cards = document.querySelectorAll('.hero-card');
 const modalBackdrop = modal.querySelector('.modal-backdrop');
@@ -30,12 +31,28 @@ function unlockBodyScroll() {
 // Use the project title as the key; edit these strings to add more content.
 const PROJECT_EXTRA_TEXT = {
   'extend ica': [
-    'The exhibition marks MAD\'s first solo show in the United States, exploring new relationships between institution, city, and public.',
-    'Through architectural models, large-scale drawings, and immersive media, the project examines how an extension can act as both a frame and a stage for contemporary art.'
+    'Contemporary art no longer conforms to the spatial assumptions of conventional exhibition architecture. As practices expand across media, scale, and modes of perception, the museum organized as a sequence of homogeneous white galleries becomes increasingly inadequate.',
+    'This project proposes an extension of the Institute of Contemporary Art (ICA) that treats exhibition space not as a neutral container, but as a packaged object. Architecture operates as a packaging apparatus—organizing, fixing, and enclosing exhibition spaces within a single architectural system.',
+    'Developed from the research project Stacked & Packed, the design translates packaging from an object-based logic to an architectural one. Walls, slabs, stairs, and structure function as packaging mechanisms, while exhibition spaces are conceived as discrete volumes embedded within the building.',
+    'Rather than extending the ICA through repetitive floor plates, the project assembles exhibition volumes that are stacked, offset, and interlocked. Structural elements lock these volumes into position and simultaneously generate circulation, producing an interior condition in which structure, movement, and exhibition are inseparable.',
+    'Circulation becomes a viewing instrument. Visitors encounter artworks from shifting heights and angles as perception unfolds through movement rather than fixed viewpoints. Floor plates operate as thresholds rather than levels, separating exhibition spaces of different heights while maintaining spatial continuity.',
+    'The extension is enclosed within a unified shell that minimizes engagement with the surrounding campus. Natural light is introduced selectively at circulation spaces, creating moments of pause within an otherwise controlled interior environment.',
+    'The existing ICA core is preserved and extended, anchoring the new architecture while acting as a spatial divider between distinct exhibition environments. Through this strategy, the project maintains structural continuity while introducing a fundamentally different spatial logic.',
+    'By conceiving exhibition spaces as packaged objects and architecture as an organizing apparatus, the ICA extension proposes an alternative model for exhibition architecture—one defined by spatial difference, embodied movement, and controlled perception rather than neutrality or flexibility.',
+
+    'Studio Instructor: Andrew Holder',
+
   ],
-  'fantova nexus': [
-    'This interior concept is structured as a series of light wells that organize circulation and frame views to the surrounding landscape.',
-    'Each chapter of the project tests different material atmospheres, from translucent partitions to mirrored ceilings.'
+  'stacked & packed': [
+    'Stacked & Packed begins with a simple task—designing a packaging system—but quickly reframes packaging as an active spatial process rather than a disposable shell. Assigned a tape measure as the object, the project asks how unpacking itself can become meaningful, turning removal into a sequence of spatial actions.',
+    'The packaging system is composed of four interlocking boxes that stabilize one another through stacking and geometry. Instead of adhesives or fasteners, locking occurs through rotation and vertical lifting. The system can be repeatedly assembled, disassembled, and reused, with the tape measure held in place by spatial tension rather than padding.',
+    'An intentionally plain outer package encloses this internal mechanism. From a narrow opening, the measuring tape itself is pulled outward, wraps once around the package, and returns to the interior. Rather than acting as an external binding element, the tape operates as both object and connector—simultaneously securing the system and revealing how it is held together. The tape measure thus links object, package, and user action into a single continuous loop.',
+    'If packaging can function as a spatial system at the scale of an object, the project asks how this logic translates when scale shifts. Using the original packaging components, a series of axonometric studies were produced through pencil, charcoal, and spray paint. These drawings explore stacking, locking, and vertical continuity, revealing how mechanical connections begin to operate as spatial thresholds.',
+    'The locking elements are then translated into horizontal plates that connect and divide four primary spatial volumes derived from the original boxes. Movement through the system echoes the act of unpacking: space is revealed through shifts in level, compression, and alignment rather than through open continuity.',
+    'Finally, the packaging envelope is reinterpreted as an architectural wrapper. Acting as both façade and container, it alternately compresses and releases the interior, producing moments of enclosure and openness. What began as a packaging exercise becomes an architectural proposition—one in which space is assembled, unlocked, and understood through use.',
+    
+    'Instructor: Andrew Holder'
+
   ],
   'Project Three': [
     'The campus is divided into seven programmatic bands, each anchored by a distinct courtyard condition.',
@@ -48,6 +65,7 @@ let currentBaseDescription = '';
 let currentExtraParagraphs = [];
 let currentImageUrls = [];
 let currentImageIndex = 0;
+let isDescriptionExpanded = false;
 
 // Observer to auto-play/pause modal videos when they enter/leave view
 let modalVideoObserver = null;
@@ -114,6 +132,7 @@ function openModalFromCard(card) {
   modalMeta.textContent = [location, type, year].filter(Boolean).join(' · ');
   currentBaseDescription = description || '';
   currentExtraParagraphs = PROJECT_EXTRA_TEXT[title] || [];
+  isDescriptionExpanded = false;
 
   // Render only the first (short) paragraph initially
   if (modalDesc) {
@@ -129,6 +148,7 @@ function openModalFromCard(card) {
   if (modalReadMoreBtn) {
     if (currentExtraParagraphs.length > 0) {
       modalReadMoreBtn.style.display = 'inline-block';
+      modalReadMoreBtn.textContent = 'READ MORE +';
     } else {
       modalReadMoreBtn.style.display = 'none';
     }
@@ -260,19 +280,38 @@ if (modalReadMoreBtn) {
   modalReadMoreBtn.addEventListener('click', () => {
     if (!modalDesc) return;
 
-    modalDesc.innerHTML = '';
-    const allParagraphs = [];
-    if (currentBaseDescription) allParagraphs.push(currentBaseDescription);
-    allParagraphs.push(...currentExtraParagraphs);
+    // Toggle between collapsed (base paragraph) and expanded (base + extras)
+    if (!isDescriptionExpanded) {
+      modalDesc.innerHTML = '';
+      const allParagraphs = [];
+      if (currentBaseDescription) allParagraphs.push(currentBaseDescription);
+      allParagraphs.push(...currentExtraParagraphs);
 
-    allParagraphs.forEach(text => {
-      const p = document.createElement('p');
-      p.textContent = text;
-      modalDesc.appendChild(p);
-    });
+      allParagraphs.forEach(text => {
+        const p = document.createElement('p');
+        p.textContent = text;
+        modalDesc.appendChild(p);
+      });
 
-    // After expanding once, hide the button
-    modalReadMoreBtn.style.display = 'none';
+      modalReadMoreBtn.textContent = 'READ LESS -';
+      isDescriptionExpanded = true;
+    } else {
+      // Collapse back to the short base description
+      modalDesc.innerHTML = '';
+      if (currentBaseDescription) {
+        const p = document.createElement('p');
+        p.textContent = currentBaseDescription;
+        modalDesc.appendChild(p);
+      }
+
+      // Scroll the text column back to the top for readability
+      if (modalTextCol) {
+        modalTextCol.scrollTop = 0;
+      }
+
+      modalReadMoreBtn.textContent = 'READ MORE +';
+      isDescriptionExpanded = false;
+    }
   });
 }
 
