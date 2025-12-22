@@ -382,6 +382,7 @@ main {
     background-color 180ms ease,
     transform 160ms ease,
     box-shadow 180ms ease;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
   box-shadow: 0 0 0 rgba(0, 0, 0, 0);
 }
 
@@ -606,8 +607,12 @@ main {
 
   /* On tablets/phones, align close button with text and edges */
   .modal-close {
+    position: sticky;
     top: 16px;
     left: 16px;
+    right: auto;
+    margin: 16px 16px 0 16px;  /* small inset from dialog edges */
+    z-index: 3;               /* stay above scrolling content */
   }
 
   .modal-layout {
