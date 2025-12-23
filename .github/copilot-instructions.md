@@ -1,42 +1,41 @@
 # AI Coding Agent Instructions for Eric Portfolio
 
-## Project Snapshot
-- Static, two-page portfolio (projects + about) in vanilla HTML/CSS/JS; open [index.html](index.html) with Live Server or any static HTTP server—there is no build, bundler, or dependency install step.
-- Architecture showcases live in [index.html](index.html); bio/footer copy in [about.html](about.html); media assets under `image/…` and intentionally keep original naming (spaces included).
-- Styling is centralized in [style.css](style.css) with `:root` tokens and expressive grid modifiers; all runtime behavior is handled in [script.js](script.js).
-- README is a placeholder, so treat this file as the authoritative onboarding guide.
+## Project Shape
+- Static two-page site; serve [index.html](index.html) or [about.html](about.html) with Live Server/`npx http-server .`—there is no build, bundler, or dependency install step.
+- Projects grid, modal, and lightbox all live in [index.html](index.html); biography/footer text sits in [about.html](about.html) with a small inline year script.
+- Runtime logic is entirely in [script.js](script.js); visual language, breakpoints, and component tokens are centralized in [style.css](style.css).
+- Media stays in `image/...`; keep folder names (including spaces) because JS datasets point to those exact strings.
 
-## DOM & Layout Contracts
-- `.site-header`/`.site-nav` are shared across pages; the "Projects" link must continue pointing to `#projects` for JS to force-scroll and reactivate the `all` category view.
-- Project cards live inside `.category-view` wrappers tagged by `data-category-view`; tabs (`.category-tab`) switch these by toggling `hidden` and `is-active` states—attribute values must stay in sync.
-- `.hero` grids rely on BEM-style modifiers (`.hero--reverse`, `.hero--architecture`, etc.) plus card-level classes (`hero-card--tall`, `hero-card--small-left`, …) to control CSS Grid areas; reuse these instead of redefining layouts.
-- Keep every `.hero-card` focusable (`tabindex="0"`) and structured as cover `<img>` + `.hero-meta` overlay so hover/focus states remain intact on desktop and mobile fallbacks.
+## DOM + Data Contracts
+- `.site-header`/`.site-nav` are shared; the Projects nav entry must point to `#projects` so [script.js](script.js) can reselect the `all` tab and smooth-scroll to top.
+- Category tabs (`.category-tab[data-category]`) toggle visibility on `.category-view[data-category-view]` via `hidden`/`is-active`; attribute values must match exactly for the switcher loop in [script.js](script.js) to work.
+- `.hero` grids rely on modifier classes (`.hero--reverse`, `.hero--architecture`, `.hero--interior`, `.hero--concept`) plus card-level roles (`hero-card--tall`, `--wide`, `--small-*`) defined in [style.css](style.css); reuse these areas instead of redefining grid templates.
+- Every `.hero-card` stays focusable (`tabindex="0"`) and structured as thumbnail `<img>` + `.hero-meta` overlay; hover shows metadata on desktop, while the mobile media query forces overlays visible.
 
-## Interaction Flow in script.js
-- `openModalFromCard()` is the single entry for modal population; it reads `dataset` fields (`title`, `location`, `type`, `year`, `description`, `images`) and hydrates modal text + media columns, so never bypass it with manual DOM edits.
-- Long-form copy lives in `PROJECT_EXTRA_TEXT`; keys must exactly match `data-title` strings to surface the READ MORE/LESS toggle that swaps between `currentBaseDescription` and extra paragraphs.
-- `preloadImages()` runs on `window.load`, iterating `.hero-card` nodes and priming image URLs (videos are skipped) to avoid blank modal flashes; make sure `data-images` is complete and ordered thumbnail-first.
-- Videos listed in `data-images` are converted to `<video>` elements with hover/focus autoplay plus an `IntersectionObserver` (rooted on `.modal-image-wrap`) so playback pauses when scrolled away.
-- The fullscreen `#image-lightbox` mirrors the modal gallery using `currentImageUrls/currentImageIndex`; navigation is through prev/next buttons, `[data-lightbox-close]`, backdrop clicks, and Arrow/Esc handlers gated by the `is-open` class.
+## Runtime Behavior (see [script.js](script.js))
+- `openModalFromCard()` consumes card `dataset` fields (`title`, `location`, `type`, `year`, `description`, `images`) to hydrate modal text/media; populate new cards through data attributes rather than touching modal DOM directly.
+- Narrative expansions live in `PROJECT_EXTRA_TEXT`; keys must match the exact `data-title` string to reveal the READ MORE toggle that flips between `currentBaseDescription` and appended paragraphs.
+- `preloadImages()` runs on `window.load`, splitting `data-images` CSV strings, skipping videos, and warming the browser cache so modal and lightbox opens are instant.
+- The modal image column supports both `<img>` and `<video>` elements; videos auto-play on hover/focus and via an `IntersectionObserver` rooted on `.modal-image-wrap`, so keep files short (`.mp4/.webm`) and order arrays thumbnail-first to maintain cover/sequence parity.
+- The fullscreen `#image-lightbox` mirrors `currentImageUrls/currentImageIndex`; prev/next buttons, `[data-lightbox-close]`, backdrop clicks, and Arrow/Esc events are conditioned on the `is-open` class.
 
-## UX Safeguards & Accessibility
-- Scroll locking is centralized via `lockBodyScroll()` / `unlockBodyScroll()` which toggle `body-lock-scroll` and remember `scrollLockScrollTop`; reuse these helpers for any new overlays instead of duplicating logic.
-- Keyboard support is already wired: `.hero-card` Enter/Space triggers the modal, while document-level Arrow/Esc are ignored unless the lightbox is open—maintain these listeners when refactoring.
-- Hover overlays (`.hero-meta`) are hidden on desktop but forced visible in the mobile breakpoint; keep copy concise so the glassmorphism pill stays legible on touch devices.
-- Alt text is inherited from the card `<img>` and modal images use `${title} image ${n}`; supply meaningful titles when adding projects so modal/media accessibility stays useful.
+## UX Safeguards
+- Body scroll locking funnels through `lockBodyScroll()`/`unlockBodyScroll()` which pin `body.body-lock-scroll`, store `scrollLockScrollTop`, and restore the previous position; reuse them for any future overlays.
+- Keyboard support already exists: cards respond to Enter/Space, modal READ MORE toggles re-scroll columns, and document-level Arrow/Esc handlers ignore input unless the lightbox is open—preserve these listeners if refactoring.
+- Alt text in cards is reused inside the modal (`${title} image ${n}`); provide meaningful `data-title` strings so accessibility copy stays descriptive.
+
+## Styling System (see [style.css](style.css))
+- `:root` tokens (`--bg`, `--text`, `--font-*`, `--card-radius`) feed all components; prefer extending these instead of hardcoding new colors or font stacks.
+- Glassmorphism header/nav, grayscale-to-color hover transitions, and rounded modal/lightbox shells establish the brand—match the existing easing/duration pairings when you add siblings.
+- The mobile breakpoint (`@media (max-width: 900px)`) linearizes grids, pins the header, converts the modal into a scrollable sheet, and forces overlays visible; test additions at ≤900px to ensure the stacked layout and scroll locks remain intact.
 
 ## Adding or Editing Projects
-- Duplicate an existing `.hero-card` inside the correct `.category-view`, update every `data-*` attribute, keep the thumbnail `<img>` in sync with the first entry of `data-images`, and ensure asset paths match `image/<project-folder>/…` (spaces are acceptable and already used).
-- When introducing a new category, add both the `.category-tab[data-category]` button and the matching `.category-view[data-category-view]` section; the JS switches purely by attribute equality.
-- Extend `PROJECT_EXTRA_TEXT` with an array of paragraphs (strings) per project when longer narratives are required; absence of an entry hides the READ MORE button automatically.
-- Any new media type beyond JPG/PNG/short MP4/WebM will need explicit handling in `openModalFromCard()` and the lightbox; keep current formats unless you also update the render logic.
-
-## Styling Practices
-- Reuse CSS tokens (`--bg`, `--text`, `--font-*`, `--card-radius`) and existing grid helpers before introducing new variables; responsive behavior is already tuned via the `@media (max-width: 900px)` block that linearizes hero grids and reconfigures the modal.
-- Glassmorphism header/nav, grayscale-to-color hover transitions, and rounded modal/lightbox elements are intentional brand cues—match their easing/duration values when adding sibling components.
-- About-page sections (`.page-main`, `.about-hero`, `.about-intro`, etc.) already have typography rules and a placeholder contact form grid; follow those selectors if you expand that page to avoid duplicating styles.
+- Duplicate a `.hero-card` inside the right `.category-view`, update all `data-*` attributes, and align the inline `<img src>` with the first entry of `data-images` so cards, modal, and lightbox stay in sync.
+- When introducing a new discipline, add both a `.category-tab[data-category]` button and a `.category-view[data-category-view]` container; the tab loop only checks for matching attribute strings.
+- Extend `PROJECT_EXTRA_TEXT` arrays when longer copy is needed; missing entries automatically hide the READ MORE button.
+- If you need new media types beyond JPG/PNG/short MP4/WebM, update both the modal renderer and lightbox detection logic before shipping.
 
 ## Local Workflow & QA
-- Preview with VS Code Live Server or `npx http-server .` to ensure relative asset paths resolve; there is no hot reload or bundler, so browser refresh is the feedback loop.
-- Validate new media paths immediately—broken URLs surface as missing modal/lightbox panels and also defeat `preloadImages()`.
-- Test both desktop hover flows and the mobile breakpoint (≤900px) since CSS swaps hover states, dialog scrolling, and hero layouts; verify modal/lightbox keyboard interactions after every structural change.
+- Preview changes through Live Server/`npx http-server .` so relative media paths resolve; there is no bundler or hot reload.
+- Validate every `data-images` path immediately—broken URLs appear as empty modal slots and defeat `preloadImages()`.
+- Regression-test desktop hover/focus flows plus the ≤900px breakpoint after any structural change, ensuring modals/lightbox interactions, scroll locking, and keyboard shortcuts still behave.

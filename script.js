@@ -357,6 +357,10 @@ if (modalReadMoreBtn) {
       isDescriptionExpanded = true;
     } else {
       // Collapse back to the short base description
+      if (document.activeElement === modalReadMoreBtn) {
+        // Prevent Safari/iPad from jumping the viewport to keep the button focused.
+        modalReadMoreBtn.blur();
+      }
       modalDesc.innerHTML = '';
       if (currentBaseDescription) {
         const p = document.createElement('p');
@@ -377,7 +381,12 @@ if (modalReadMoreBtn) {
         const mobileScrollTarget = (modalDialog && modalDialog.scrollHeight > modalDialog.clientHeight)
           ? modalDialog
           : modal;
-        scrollElementToTop(mobileScrollTarget, true);
+
+        // Defer the scroll to the next frame so touch browsers don't misinterpret
+        // the tap as a pull-to-refresh gesture.
+        requestAnimationFrame(() => {
+          scrollElementToTop(mobileScrollTarget);
+        });
       }
 
       modalReadMoreBtn.textContent = 'READ MORE +';
