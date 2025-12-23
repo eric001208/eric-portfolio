@@ -94,11 +94,24 @@ let isDescriptionExpanded = false;
 
 function scrollElementToTop(el, smooth = false) {
   if (!el) return;
+  const behavior = smooth ? 'smooth' : 'auto';
+
   if (typeof el.scrollTo === 'function') {
-    el.scrollTo({ top: 0, behavior: smooth ? 'smooth' : 'auto' });
-  } else {
-    el.scrollTop = 0;
+    try {
+      el.scrollTo({ top: 0, left: 0, behavior });
+      return;
+    } catch (err) {
+      try {
+        el.scrollTo(0, 0);
+        return;
+      } catch (nestedErr) {
+        // Fall through to direct scrollTop assignment when the browser
+        // does not support element.scrollTo in either signature.
+      }
+    }
   }
+
+  el.scrollTop = 0;
 }
 
 // Observer to auto-play/pause modal videos when they enter/leave view
@@ -361,7 +374,10 @@ if (modalReadMoreBtn) {
       // On tablet/mobile layouts, also scroll the dialog container so
       // the user lands at the modal header again.
       if (window.matchMedia('(max-width: 900px)').matches) {
-        scrollElementToTop(modalDialog, true);
+        const mobileScrollTarget = (modalDialog && modalDialog.scrollHeight > modalDialog.clientHeight)
+          ? modalDialog
+          : modal;
+        scrollElementToTop(mobileScrollTarget, true);
       }
 
       modalReadMoreBtn.textContent = 'READ MORE +';
