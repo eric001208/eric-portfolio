@@ -54,10 +54,35 @@ const PROJECT_EXTRA_TEXT = {
     'Instructor: Andrew Holder'
 
   ],
-  'Project Three': [
-    'The campus is divided into seven programmatic bands, each anchored by a distinct courtyard condition.',
-    'Roof gardens and outdoor terraces stitch these bands together, creating a continuous public promenade.'
-  ]
+  'fantova nexus': [
+    'Located in Fantova, a small village in northern Spain situated along a popular hiking network, the site occupies a paradoxical position. While the surrounding trails attract hikers for their scenic landscapes, the village itself remains largely bypassed. Despite its rich local traditions and cultural heritage, Fantova lacks spaces for rest, gathering, or prolonged stay. As a result, the village functions primarily for residents, rarely becoming part of the hikers’ lived experience.',
+    'Commissioned by the Gaudí Foundation, the project proposes a new cultural and spatial infrastructure that reconnects the village to the hiking routes while introducing programs for artistic production and temporary habitation. Rather than inserting a singular destination object, the project redefines the hiking path itself—allowing it to bend, enter, and pass through the architecture.',
+    'The architectural complex is organized as a continuous nexus between village and landscape. A central exhibition and communal space anchors the site, flanked by artist studios, hostel units, and shaded public platforms. The hiking route is not terminated at the building, but rather woven through it, enabling hikers to pause, observe village life, encounter artistic production, or continue onward.',
+    'Formally, all architectural elements—roofs, shelters, housing units, and exhibition spaces—are generated from the same system of decomposed cubic volumes. These geometries adapt to programmatic needs and environmental conditions, becoming lightweight shading canopies, inhabitable volumes, or porous thresholds. The repeated transformation of the cube establishes a coherent formal language while allowing variation across scales and functions.',
+    'Ultimately, Fantova Nexus is not conceived as an isolated building, but as a spatial mediator—one that translates abstract geometry into lived experience, and reconnects landscape, culture, and movement into a single continuous system.'
+  ],
+
+  'arlington library': [
+    'Originally elevated above street level and isolated by a fenced garden, the Arlington Library in Brooklyn presents itself as a closed object rather than a civic invitation. Upon my first visit, several spatial problems became immediately apparent: the raised garden separates the library from everyday street life; the central atrium is sealed, cutting off daylight and visual continuity; and the basement remains largely unused, effectively reducing a three-story building into only two active floors. These conditions limit both spatial accessibility and the library’s potential as a community-centered institution.',
+    'The renovation begins by redefining the ground. The existing elevated garden is sunk to street level, transforming the former basement into a new public first floor. This intervention restores spatial continuity between the library and its surrounding neighborhood, allowing pedestrians to enter naturally rather than ascend into an isolated platform. Simultaneously, the atrium is reopened to bring daylight deep into the building, re-establishing vertical visual connections and spatial orientation across floors.',
+    'A new stair system is introduced as the primary organizing element of the library. Rather than functioning solely as circulation, the stairs operate as spatial infrastructure. On the first floor, they expand into amphitheater-like seating, enabling lectures, readings, discussions, children’s gatherings, and informal social activity. Noise and movement are not suppressed but intentionally accommodated, allowing the library to absorb everyday community life rather than exclude it.',
+    'The second floor becomes the primary collection space, housing the majority of the library’s books and reading areas. Above, the third floor is reserved for enclosed, quiet study spaces, offering acoustic and visual retreat. These three atmospheres—active, focused, and silent—are vertically stratified but continuously connected.',
+    'Binding these spaces together is a monumental semi-circular bookshelf that spans all three floors. Rather than functioning merely as storage, the bookshelf becomes a spatial and conceptual organizer. Books are arranged according to floor level, corresponding to varying degrees of noise, activity, and readership. In this way, knowledge is spatialized, and the act of reading is understood as part of a broader public spectrum rather than a singular, silent condition.',
+    'Throughout the intervention, the existing structural system is preserved and respected. New circulation paths, staircases, walkways, and bookshelves are carefully inserted within the original framework, allowing the building’s historical logic to coexist with contemporary public demands. Ultimately, the project reframes the library not as a space of enforced quietness, but as an open, civic interior—one that welcomes the public, embraces social exchange, and supports multiple modes of collective and individual engagement.',
+
+    'Studio Instructor: Calvert Wright'
+  ],
+
+  'garden house': [
+    'This renovation rethinks a traditional Brooklyn townhouse as a light-driven domestic landscape shaped by both human and animal inhabitation. The clients—an elderly couple living full-time in Brooklyn, their college-aged child who returns periodically, and a cat and a dog—required a home that could support changing rhythms of occupation while remaining calm, accessible, and spatially generous.',
+    'The existing townhouse is defined by its long and narrow proportion and is closely surrounded by neighboring buildings on both sides and at the rear. As a result, access to natural light is limited and uneven. Rather than treating this as a constraint, the project takes daylight as its primary organizing principle. A central courtyard with a skylight garden becomes the spatial and atmospheric core of the house, naturally dividing the plan into two zones while allowing light to penetrate deep into the interior.',
+    'To further extend daylight and activate underutilized edges, a secondary side garden is introduced. This linear outdoor space functions both as a light well and as a playful landscape for the family’s pets, allowing the cat and dog to move freely along the length of the house while maintaining visual and spatial continuity with the interior.',
+    'Vertically, the house is organized into three distinct atmospheric layers. The ground floor accommodates shared and active programs—living and dining—where openness, circulation, and social interaction are emphasized. The second floor is conceived as a quieter zone for rest and retreat, prioritizing privacy and acoustic separation. Above, the roof is transformed into an elevated garden, extending domestic life outdoors and offering an additional layer of light, air, and seasonal change.',
+    'Through a careful orchestration of light, section, and landscape, the project reframes the townhouse not as a closed urban object, but as a porous, vertically layered environment—one that supports everyday life, intergenerational living, and non-human movement within a dense Brooklyn context.',
+
+    'Instructor: Calvert Wright'
+  ],
+
   // Add more entries for other projects as needed
 };
 
@@ -66,6 +91,15 @@ let currentExtraParagraphs = [];
 let currentImageUrls = [];
 let currentImageIndex = 0;
 let isDescriptionExpanded = false;
+
+function scrollElementToTop(el, smooth = false) {
+  if (!el) return;
+  if (typeof el.scrollTo === 'function') {
+    el.scrollTo({ top: 0, behavior: smooth ? 'smooth' : 'auto' });
+  } else {
+    el.scrollTop = 0;
+  }
+}
 
 // Observer to auto-play/pause modal videos when they enter/leave view
 let modalVideoObserver = null;
@@ -229,6 +263,11 @@ function openModalFromCard(card) {
   // Lock background scroll while modal is open
   lockBodyScroll();
 
+  // Reset scroll positions when the modal opens
+  scrollElementToTop(modalTextCol);
+  scrollElementToTop(modalImageWrap);
+  scrollElementToTop(modalDialog);
+
   // Restart backdrop and dialog animations every time
   restartAnimation(modalBackdrop, 'is-animating');
   restartAnimation(modalDialog, 'is-animating');
@@ -277,7 +316,15 @@ modal.addEventListener('click', e => {
 
 // Expand modal description with extra paragraphs when READ MORE is clicked
 if (modalReadMoreBtn) {
-  modalReadMoreBtn.addEventListener('click', () => {
+  modalReadMoreBtn.addEventListener('click', (e) => {
+    // On some mobile/tablet browsers, buttons can trigger
+    // unintended default behavior; always treat this as
+    // a pure JS toggle with no navigation or form submit.
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
     if (!modalDesc) return;
 
     // Toggle between collapsed (base paragraph) and expanded (base + extras)
@@ -305,8 +352,16 @@ if (modalReadMoreBtn) {
       }
 
       // Scroll the text column back to the top for readability
-      if (modalTextCol) {
-        modalTextCol.scrollTop = 0;
+      scrollElementToTop(modalTextCol);
+
+      // Smoothly scroll the media column so it animates back to the
+      // top, matching how the modal first appears.
+      scrollElementToTop(modalImageWrap, true);
+
+      // On tablet/mobile layouts, also scroll the dialog container so
+      // the user lands at the modal header again.
+      if (window.matchMedia('(max-width: 900px)').matches) {
+        scrollElementToTop(modalDialog, true);
       }
 
       modalReadMoreBtn.textContent = 'READ MORE +';
